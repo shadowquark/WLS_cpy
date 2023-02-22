@@ -1,5 +1,5 @@
 # WLS_cpy
-Use C code to realize online calculation of weighted linear regression, and pack the code to Python function.
+Use `C` code to realize online calculation of weighted linear regression, and pack the code to `Python` function.
 
 ### Problem
 When we finish the calculation of weighted linear regression for `n1` samples, we want to update our results for other `n2` samples in the future, instead of calculating `n1 + n2` from the beginning with high time and space complexity.
@@ -7,7 +7,7 @@ When we finish the calculation of weighted linear regression for `n1` samples, w
 ### Pipeline
 1. [lapack](https://netlib.org/lapack/) is used. `liblapack` can be find in package manager of Linux/Homebrew/Windows Subsystem for Linux.
 
-2. Use `gcc calculator.c  -llapack` to compile C code
+2. Use `gcc calculator.c  -llapack` to compile `C` code
 
 3. In the main file of `calculator.c`, a very large loop exists to test whether all memory used for one loop is successfully recycled. Run `a.out` to test, and check the usage of system memory.
 
@@ -18,7 +18,7 @@ When we finish the calculation of weighted linear regression for `n1` samples, w
 6. Run `python benchmark.py` for a series of tests.
     * Check whether the `C` code agrees with the results from `numpy`.
     * Check the speed of the `statsmodels` package, my `C` code, and `numpy`, especially for online updates.
-    * Check the speed and memory usage of the `statsmodels` package, and my `C` code with a very large dataset.
+    * Check the speed and memory usage of the `statsmodels` package and my `C` code with a very large dataset.
 
 ### Conclusion
 
