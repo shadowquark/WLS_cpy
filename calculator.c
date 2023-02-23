@@ -36,7 +36,7 @@ double *inverse(double *x, int m)
 	free(IPIV);
 	free(WORK);
 	if (INFO)
-		printf("Invert Fail");
+		printf("Matrix is not invertible\n");
 	return x;
 }
 double *add(double *x, double *y, int m, int n)
@@ -119,7 +119,7 @@ double *wls_iter(
 		free(IPIV);
 		free(WORK);
 		if (INFO)
-			printf("Invert Fail");
+			printf("Matrix is not invertible\n");
 		return x;
 	}
 	double *add(double *x, double *y, int m, int n)
@@ -161,13 +161,13 @@ double *wls_iter(
 		for (int j = 0; j < m; ++ j)
 			*(output + i + j) = *(xTwx_next + i + j);
 	int pos = m * m;
-	double *xTwy_next = times(xTw, y_next, m, n2, 1);
-	double *xTwy_iter = add(xTwy, xTwy_next, m, 1);
+	double *xTwy_iter = times(xTw, y_next, m, n2, 1);
+	double *xTwy_next = add(xTwy, xTwy_iter, m, 1);
 	for (int i = 0; i < m; ++ i)
-		*(output + i + pos) = *(xTwy_iter + i);
+		*(output + i + pos) = *(xTwy_next + i);
 	pos += m;
 	double *xTwx_inverse = inverse(xTwx_next, m);
-	double *predict = times(xTwx_inverse, xTwy_iter, m, m, 1);
+	double *predict = times(xTwx_inverse, xTwy_next, m, m, 1);
 	for (int i = 0; i < m; ++ i)
 		*(output + i + pos) = *(predict + i);
 	pos += m;
@@ -186,10 +186,10 @@ double *wls_iter(
 		free(yhat);
 	}
 	free(xTw);
-	free(xTwx_next);
 	free(xTwx_iter);
-	free(xTwy_next);
+	free(xTwx_next);
 	free(xTwy_iter);
+	free(xTwy_next);
 	free(predict);
 	free(yhat_next);
 	return output;
@@ -197,9 +197,10 @@ double *wls_iter(
 int main()
 {
 	srand(time(0));
-	double a[8] = {(double)rand(), (double)rand(), (double)rand(), 
+	double a[12] = {(double)rand(), (double)rand(), (double)rand(), 
 					(double)rand(), (double)rand(), (double)rand(), 
-					(double)rand(), (double)rand()};
+					(double)rand(), (double)rand(), (double)rand(), 
+					(double)rand(), (double)rand(), (double)rand()};
 	double b[9] = {(double)rand(), (double)rand(), (double)rand(), 
 					(double)rand(), (double)rand(), (double)rand(), 
 					(double)rand(), (double)rand(), (double)rand()};
@@ -208,17 +209,9 @@ int main()
 					(double)rand(), (double)rand(), (double)rand()};
 	double e[2] = {(double)rand(), (double)rand()};
 	double f[2] = {(double)rand(), (double)rand()};
-	double *aa = add(a, b, 2, 3);
-	double *bb = times(a, b, 2, 3, 2);
-	double *cc = calc_xTw(a, c, 2, 3);
-	double *output = wls_iter(a, b, c, d, e, f, 5, 2, 3, 1);
-	int tot_len = 4 + 2 * 2 + 3 * (3 + 2);
-	printf("%d\n", tot_len);
-	for (int i = 0; i < tot_len; ++ i)
-		printf("%lf\n", *(output + i));
 	for (int i = 0; i < 1000000000; ++ i)
 	{
-		double *test = wls_iter(a, c, f, b, d, e, 0, 2, 3, 1);
+		double *test = wls_iter(a, b, c, d, e, f, 4, 2, 3, 1);
 		free(test);
 	}
 	return 0;
