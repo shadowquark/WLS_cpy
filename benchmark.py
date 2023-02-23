@@ -203,21 +203,19 @@ xTwx = results[0]
 xTwy = results[1]
 [print(x) for x in results[2]]
 time2 = time.time()
-time3 = time.time()
 test = sm.WLS(Y, X, weights = w, missing = "drop").fit()
 print(test.summary())
-time4 = time.time()
+time3 = time.time()
 results = c_wls_iter(Y2, X2, w2, n - step, m,
                         xTwx = xTwx, xTwy = xTwy, n1 = step)
 [print(x) for x in results[2]]
-time5 = time.time()
-time6 = time.time()
+time4 = time.time()
 print("Time Usage")
 print(f"statsmodels WLS {step}:", time1 - time0)
 print(f"C code {step}:", time2 - time1)
 print("We get the same results for 2 methods above.")
-print(f"statsmodels WLS {n}:", time4 - time3)
-print(f"C code next {n - step}:", time5 - time4)
+print(f"statsmodels WLS {n}:", time3 - time2)
+print(f"C code next {n - step}:", time4 - time3)
 print("We get the same results for 2 methods above.")
 print("\n\n\n\n\n")
 
