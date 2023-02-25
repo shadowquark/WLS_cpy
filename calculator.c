@@ -24,9 +24,16 @@ double *inverse(double *x, int m)
 	);
 	// generate inverse of a matrix given its LU decomposition
 	extern void dgetri_(
-		int *N, double *A, int *lda, int *IPIV,
-		double *WORK, int *lwork, int *INFO
+		int *N, double *A, int *LDA, int *IPIV,
+		double *WORK, int *LWORK, int *INFO
 	);
+	// N is the size of the Matrix
+	// LDA >= max(1, n) to assign memory of the double array
+	// IPIV saves the interchange of rows
+	// INFO returns whether operation succeeds
+	// LWORK is the size of WORK
+	// WORK is the workspace used for calculation
+	// WORK and IPIV should be recycled
 	int N = m;
 	int LDA = m;
 	int *IPIV = malloc(sizeof(int) * m);
@@ -100,9 +107,16 @@ double *wls_iter(
 		);
 		// generate inverse of a matrix given its LU decomposition
 		extern void dgetri_(
-			int *N, double *A, int *lda, int *IPIV,
-			double *WORK, int *lwork, int *INFO
+			int *N, double *A, int *LDA, int *IPIV,
+			double *WORK, int *LWORK, int *INFO
 		);
+		// N is the size of the Matrix
+		// LDA >= max(1, n) to assign memory of the double array
+		// IPIV saves the interchange of rows
+		// INFO returns whether operation succeeds
+		// LWORK is the size of WORK
+		// WORK is the workspace used for calculation
+		// WORK and IPIV should be recycled
 		int N = m;
 		int LDA = m;
 		int *IPIV = malloc(sizeof(int) * m);
