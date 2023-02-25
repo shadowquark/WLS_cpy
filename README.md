@@ -22,4 +22,4 @@ When we finish the calculation of weighted linear regression for `n1` samples, w
 
 ### Conclusion
 
-My `C` code is much more efficient than the other methods.
+My `C` code is much more efficient than the other methods. More details can be found in `report.ipynb`.
