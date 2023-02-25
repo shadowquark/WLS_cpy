@@ -3,6 +3,7 @@
 #include<stdbool.h>
 #include<math.h>
 #include<time.h>
+// Print Matrix(m, n)
 void print(double *x, int m, int n)
 {
 	for (int i = 0; i < m * n; i += n)
@@ -13,6 +14,7 @@ void print(double *x, int m, int n)
 	}
 	printf("\n");
 }
+// Use lapack to calculate Matrix(m, m)^{-1}
 double *inverse(double *x, int m)
 {
 	// LU decomoposition of a general matrix
@@ -39,6 +41,7 @@ double *inverse(double *x, int m)
 		printf("Matrix is not invertible\n");
 	return x;
 }
+// Matrix1(m, n) + Maxtrix2(m, n)
 double *add(double *x, double *y, int m, int n)
 {
 	double *output = malloc(sizeof(double) * m * n);
@@ -47,6 +50,7 @@ double *add(double *x, double *y, int m, int n)
 			*(output + i + j) = *(x + i + j) + *(y + i + j);
 	return output;	
 }
+// Matrix1(m, p) * Maxtrix2(p, n)
 double *times(double *x, double *y, int m, int p, int n)
 {
 	double *output = malloc(sizeof(double) * m * n);
@@ -60,6 +64,7 @@ double *times(double *x, double *y, int m, int p, int n)
 		}
 	return output;
 }
+// Maxtrix1(m, n) * Diag_Matrix(n, n)
 double *calc_xTw(double *x, double *w, int m, int n)
 {
 	double *output = malloc(sizeof(double) * m * n);
@@ -68,24 +73,14 @@ double *calc_xTw(double *x, double *w, int m, int n)
 			*(output + i * n + j) = *(x + j * m + i) * *(w + j);
 	return output;
 }
-//double *calc_xTw(double *x, double *w, int m, int n)
-//{
-//	double *output = malloc(sizeof(double) * m * n);
-//	for (int i = 0; i < m; ++ i)
-//		for (int j = 0; j < n; ++ j)
-//		{
-//			double temp = 0;
-//			for (int k = 0; k < n; ++ k)
-//				temp += *(x + k * m + i) * *(w + k * n + j);
-//			*(output + i * n + j) = temp;
-//		}
-//	return output;
-//}
 double *wls_iter(
 	double *x, double *xTwx, double *xTwy,
 	double *x_next, double *w_next, double *y_next,
 	int n1, int n2, int m, bool update
 ){
+// We need to copy the outside functions to inside.
+// Otherwise, when calling the wls_iter from python,
+//	the communication between different functions may fail.
 	void print(double *x, int m, int n)
 	{
 		for (int i = 0; i < m * n; i += n)
