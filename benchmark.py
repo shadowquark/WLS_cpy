@@ -29,7 +29,7 @@ def c_xTw(x, y, m, n):
 def c_wls_iter(
     y_next, x_next, w_next, n2, m,
     x = np.array([]), xTwx = None, xTwy = None,
-    n1 = 0, update = False
+    n1 = 0, update = False, permutation = False
 ):
     tot_len = n1 + 2 * n2 + m * (m + 2)
     if xTwx is None:
@@ -37,9 +37,15 @@ def c_wls_iter(
     if xTwy is None:
         xTwy = np.zeros((m, 1))
     double = lambda x: x.astype('d')
-    x_next = double(x_next)
-    w_next = double(w_next)
-    y_next = double(y_next)
+    if permutation:
+        perm = F(n2, range, np.random.permutation)
+        x_next = double(x_next[perm])
+        w_next = double(w_next[perm])
+        y_next = double(y_next[perm])
+    else:
+        x_next = double(x_next)
+        w_next = double(w_next)
+        y_next = double(y_next)
     x = double(x)
     xTwx = double(xTwx)
     xTwy = double(xTwy)
@@ -64,7 +70,7 @@ def c_wls_iter(
 
 loop = 1
 for i in range(loop):
-    print('\n', i)
+    print("\nloop:", i)
     m, n = 3, 2
     matrix1 = np.random.rand(m, n)
     matrix2 = np.random.rand(m, n)
