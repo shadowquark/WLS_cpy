@@ -180,19 +180,17 @@ double *wls_iter(
 	for (int i = 0; i < m; ++ i)
 		*(output + i + pos) = *(predict + i);
 	pos += m;
-	double *yhat_next = times(x_next, predict, n2, m, 1);
-	for (int i = 0; i < n2; ++ i)
-		*(output + i + pos) = *(yhat_next + i);
-	pos += n2;
 	if (update)
 	{
 		double *yhat = times(x, predict, n1, m, 1);
+		double *yhat_next = times(x_next, predict, n2, m, 1);
 		for (int i = 0; i < n1; ++ i)
 			*(output + i + pos) = *(yhat + i);
 		pos += n1;
 		for (int i = 0; i < n2; ++ i)
 			*(output + i + pos) = *(yhat_next + i);
 		free(yhat);
+		free(yhat_next);
 	}
 	free(xTw);
 	free(xTwx_iter);
@@ -200,7 +198,6 @@ double *wls_iter(
 	free(xTwy_iter);
 	free(xTwy_next);
 	free(predict);
-	free(yhat_next);
 	return output;
 }
 int main()

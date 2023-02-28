@@ -56,12 +56,11 @@ def c_wls_iter(
     xTwx = results[:m * m].reshape(m, m)
     xTwy = results[m * m : m * (m + 1)]
     predict = results[m * (m + 1) : m * (m + 2)]
-    yhat_next = results[m * (m + 2) : m * (m + 2) + n2]
     if update:
         yhat = results[-n1 - n2:]
     else:
         yhat = None
-    return xTwx, xTwy, predict, yhat_next, yhat
+    return xTwx, xTwy, predict, yhat
 
 loop = 1
 for i in range(loop):
@@ -103,7 +102,7 @@ for i in range(loop):
     matrix4 = np.random.rand(n2, m)
     matrix5 = np.random.rand(n2)
     matrix6 = np.random.rand(n2, 1)
-    results1, results2, results3, results4, results5 = c_wls_iter(
+    results1, results2, results3, results4 = c_wls_iter(
         matrix6, matrix4, matrix5, n2, m, 
         matrix1, matrix2, matrix3, n1, update
     )
@@ -122,15 +121,10 @@ for i in range(loop):
     test = results3.reshape(-1) - test3.reshape(-1)
     print(len(temp[temp > 1E-3]) == 0)
     print(f"{m} * {1}\n")
-    print("yhat_next\n", results4)
-    test4 = np.matmul(matrix4, test3)
-    test = results4.reshape(-1) - test4.reshape(-1)
-    print(len(temp[temp > 1E-3]) == 0)
-    print(f"{n2} * {1}\n")
-    print("yhat\n", results5)
     if update:
-        test5 = np.matmul(np.concatenate((matrix1, matrix4)), test3)
-        test = results5.reshape(-1) - test5.reshape(-1)
+        print("yhat\n", results4)
+        test4 = np.matmul(np.concatenate((matrix1, matrix4)), test3)
+        test = results4.reshape(-1) - test4.reshape(-1)
         print(len(temp[temp > 1E-3]) == 0)
         print(f"{n1 + n2} * {1}\n")
     else:
