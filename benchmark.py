@@ -31,7 +31,7 @@ def c_wls_iter(
     x = np.array([]), xTwx = None, xTwy = None,
     n1 = 0, update = False, permutation = False
 ):
-    tot_len = n1 + 2 * n2 + m * (m + 2)
+    tot_len = n1 + n2 + m * (m + 2)
     if xTwx is None:
         xTwx = np.zeros((m, m))
     if xTwy is None:
@@ -79,6 +79,8 @@ for i in range(loop):
     temp = temp1 - temp2
     print("add")
     print(len(temp[temp > 1E-3]) == 0)
+    def test_add():
+        assert len(temp[temp > 1E-3]) == 0
 
     m, n, p = 3, 8, 2
     matrix1 = np.random.rand(m, p)
@@ -88,6 +90,8 @@ for i in range(loop):
     temp = temp1 - temp2
     print("times")
     print(len(temp[temp > 1E-3]) == 0)
+    def test_times():
+        assert len(temp[temp > 1E-3]) == 0
 
     m, n = 3, 2
     matrix1 = np.random.rand(n, m)
@@ -98,6 +102,8 @@ for i in range(loop):
     temp = temp1 - temp2
     print("xTw")
     print(len(temp[temp > 1E-3]) == 0)
+    def test_xTw():
+        assert len(temp[temp > 1E-3]) == 0
 
     n1, n2, m, update = 4, 2, 3, True
     matrix1 = np.random.rand(n1, m)
@@ -112,26 +118,34 @@ for i in range(loop):
         matrix6, matrix4, matrix5, n2, m, 
         matrix1, matrix2, matrix3, n1, update
     )
-    print("xTwx\n", results1)
+    print("\nxTwx\n", results1)
     test1 = matrix2 + np.matmul(np.matmul(matrix4.T, np.diag(matrix5)), matrix4)
-    test = results1.reshape(-1) - test1.reshape(-1)
-    print(len(temp[temp > 1E-3]) == 0)
+    tmp1 = results1.reshape(-1) - test1.reshape(-1)
+    print(len(tmp1[tmp1 > 1E-3]) == 0)
+    def test_1():
+        assert len(tmp1[tmp1 > 1E-3]) == 0
     print(f"{m} * {m}\n")
-    print("xTwy\n", results2)
+    print("xTwy\n", results2.reshape(-1, 1))
     test2 = matrix3 + np.matmul(np.matmul(matrix4.T, np.diag(matrix5)), matrix6)
-    test = results2.reshape(-1) - test2.reshape(-1)
-    print(len(temp[temp > 1E-3]) == 0)
+    tmp2 = results2.reshape(-1) - test2.reshape(-1)
+    print(len(tmp2[tmp2 > 1E-3]) == 0)
+    def test_2():
+        assert len(tmp2[tmp2 > 1E-3]) == 0
     print(f"{m} * {1}\n")
-    print("predict\n", results3)
+    print("predict\n", results3.reshape(-1, 1))
     test3 = np.matmul(np.linalg.inv(test1), test2)
-    test = results3.reshape(-1) - test3.reshape(-1)
-    print(len(temp[temp > 1E-3]) == 0)
+    tmp3 = results3.reshape(-1) - test3.reshape(-1)
+    print(len(tmp3[tmp3 > 1E-3]) == 0)
+    def test_3():
+        assert len(tmp3[tmp3 > 1E-3]) == 0
     print(f"{m} * {1}\n")
     if update:
-        print("yhat\n", results4)
+        print("yhat\n", results4.reshape(-1, 1))
         test4 = np.matmul(np.concatenate((matrix1, matrix4)), test3)
-        test = results4.reshape(-1) - test4.reshape(-1)
-        print(len(temp[temp > 1E-3]) == 0)
+        tmp4 = results4.reshape(-1) - test4.reshape(-1)
+        print(len(tmp4[tmp4 > 1E-3]) == 0)
+        def test_4():
+            assert len(tmp4[tmp4 > 1E-3]) == 0
         print(f"{n1 + n2} * {1}\n")
     else:
         print("NONE")
@@ -154,23 +168,43 @@ time1 = time.time()
 results = c_wls_iter(Y1, X1, w1, step, m)
 xTwx = results[0]
 xTwy = results[1]
-[print(x) for x in results[2]]
+tmp00 = results[2].copy().reshape(-1)
+print("C")
+[print(x) for x in tmp00]
+tmp00 -= test.params.reshape(-1)
+def test_sm_c_0():
+    assert len(tmp00[tmp00 > 1E-3]) == 0
 time2 = time.time()
 test1 = np.matmul(np.matmul(X1.T, np.diag(w1)), X1)
 test2 = np.matmul(np.matmul(X1.T, np.diag(w1)), Y1.reshape(-1, 1))
-print(np.matmul(np.linalg.inv(test1), test2))
+tmp01 = np.matmul(np.linalg.inv(test1), test2).reshape(-1)
+print("numpy")
+[print(x) for x in tmp01]
+tmp01 -= results[2].copy().reshape(-1)
+def test_np_c_0():
+    assert len(tmp01[tmp01 > 1E-3]) == 0
 time3 = time.time()
 test = sm.WLS(Y, X, weights = w, missing = "drop").fit()
 print(test.summary())
 time4 = time.time()
 results = c_wls_iter(Y2, X2, w2, n - step, m,
                         xTwx = xTwx, xTwy = xTwy, n1 = step)
-[print(x) for x in results[2]]
+tmp02 = results[2].copy().reshape(-1)
+print("C")
+[print(x) for x in tmp02]
+tmp02 -= test.params.reshape(-1)
+def test_sm_c_1():
+    assert len(tmp02[tmp02 > 1E-3]) == 0
 time5 = time.time()
 test1 = xTwx + np.matmul(np.matmul(X2.T, np.diag(w2)), X2)
 test2 = xTwy.reshape(-1, 1)\
         + np.matmul(np.matmul(X2.T, np.diag(w2)), Y2.reshape(-1, 1))
-print(np.matmul(np.linalg.inv(test1), test2))
+tmp03 = np.matmul(np.linalg.inv(test1), test2).reshape(-1)
+print("numpy")
+[print(x) for x in tmp03]
+tmp03 -= results[2].copy().reshape(-1)
+def test_np_c_1():
+    assert len(tmp03[tmp03 > 1E-3]) == 0
 time6 = time.time()
 print("Time Usage")
 print(f"statsmodels WLS {step}:", time1 - time0)
@@ -201,14 +235,24 @@ time1 = time.time()
 results = c_wls_iter(Y1, X1, w1, step, m)
 xTwx = results[0]
 xTwy = results[1]
-[print(x) for x in results[2]]
+tmp10 = results[2].copy().reshape(-1)
+print("C")
+[print(x) for x in tmp10]
+tmp10 -= test.params.reshape(-1)
+def test_sm_c_2():
+    assert len(tmp10[tmp10 > 1E-3]) == 0
 time2 = time.time()
 test = sm.WLS(Y, X, weights = w, missing = "drop").fit()
 print(test.summary())
 time3 = time.time()
 results = c_wls_iter(Y2, X2, w2, n - step, m,
                         xTwx = xTwx, xTwy = xTwy, n1 = step)
-[print(x) for x in results[2]]
+tmp11 = results[2].copy().reshape(-1)
+print("C")
+[print(x) for x in tmp11]
+tmp11 -= test.params.reshape(-1)
+def test_sm_c_3():
+    assert len(tmp11[tmp11 > 1E-3]) == 0
 time4 = time.time()
 print("Time Usage")
 print(f"statsmodels WLS {step}:", time1 - time0)

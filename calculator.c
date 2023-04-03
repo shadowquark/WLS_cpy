@@ -161,7 +161,7 @@ double *wls_iter(
 		return output;
 	}
 	double *output = malloc(
-		sizeof(double) * (n1 + 2 * n2 + m * (m + 2))
+		sizeof(double) * (n1 + n2 + m * (m + 2))
 	);
 	double *xTw = calc_xTw(x_next, w_next, m, n2);
 	double *xTwx_iter = times(xTw, x_next, m, n2, m);
